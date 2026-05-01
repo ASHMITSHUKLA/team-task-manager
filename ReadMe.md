@@ -25,8 +25,8 @@ A simple and clean **Team Task Manager** built with Python (Flask)
 
 
 # Clone the repository
-git clone https://github.com/ASHMITSHUKLA/team-task-manager.git
-cd team-task-manager
+ https://github.com/ASHMITSHUKLA/team-task-manager.git
+
 
 # Install dependencies
 pip install -r requirements.txt
