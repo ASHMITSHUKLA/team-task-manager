@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<a href="{{ url_for('dashboard.index') }}" class="btn btn-secondary mb-3">← Back to Dashboard</a>
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>My Projects</h2>
+        {% if current_user.role == 'admin' %}
+        <a href="{{ url_for('projects.create') }}" class="btn btn-success">+ Create New Project</a>
+        {% endif %}
+    </div>
+
+    {% if projects %}
+    <div class="row">
+        {% for project in projects %}
+        <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">{{ project.name }}</h5>
+            <p class="card-text text-muted">
+                {% if project.description %}
+                    {{ project.description[:80] }}{% if project.description|length > 80 %}...{% endif %}
+                {% else %}
+                    No description
+                {% endif %}
+            </p>
+            
+            {% set total = project.tasks|length %}
+            {% set completed = project.tasks|selectattr('status', 'equalto', 'done')|list|length %}
+            <div class="mt-3">
+                <small class="text-muted">Progress</small>
+                <div class="progress" style="height: 8px;">
+                    <div class="progress-bar bg-success" role="progressbar" 
+                         style="width: {{ (completed / total * 100)|round if total > 0 else 0 }}%;" 
+                         aria-valuenow="{{ completed }}" aria-valuemin="0" aria-valuemax="{{ total }}">
+                    </div>
+                </div>
+                <small class="text-muted">{{ completed }} / {{ total }} tasks done</small>
+            </div>
+        </div>
+        <div class="card-footer bg-white">
+            <a href="{{ url_for('tasks.project_tasks', project_id=project.id) }}" 
+               class="btn btn-sm btn-primary">View Tasks</a>
+        </div>
+    </div>
+</div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        No projects yet.
+        {% if current_user.role == 'admin' %}
+        <a href="{{ url_for('projects.create') }}">Create your first project</a>
+        {% else %}
+        Ask your Admin to add you to a project.
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

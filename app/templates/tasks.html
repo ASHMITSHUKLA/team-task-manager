@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Tasks for Project: <span class="text-primary">{{ project.name }}</span></h2>
+    
+    <a href="{{ url_for('projects.index') }}" class="btn btn-secondary mb-3">← Back to Projects</a>
+
+    <!-- Create Task Form -->
+    <div class="card mb-4">
+        <div class="card-header">Add New Task</div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('tasks.create') }}">
+                <input type="hidden" name="project_id" value="{{ project.id }}">
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type="text" name="title" class="form-control" placeholder="Task Title" required>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="date" name="due_date" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <select name="assigned_to" class="form-select">
+                            <option value="">Assign to...</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.username }} ({{ user.role }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <textarea name="description" class="form-control mt-2" placeholder="Description (optional)"></textarea>
+                <button type="submit" class="btn btn-primary mt-3">Create Task</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tasks List -->
+    <h4>Tasks ({{ tasks|length }})</h4>
+    {% if tasks %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Task</th>
+                <th>Assigned To</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+<tr>
+    <td>{{ task.title }}</td>
+    <td>
+        {% if task.assignee %}
+            {{ task.assignee.username }}
+        {% else %}
+            <span class="text-muted">Unassigned</span>
+        {% endif %}
+    </td>
+    <td>{{ task.due_date.strftime('%d %b') if task.due_date else '-' }}</td>
+    <td>
+    <span class="badge bg-{{ 'success' if task.status=='done' else 'warning' if task.status=='inprogress' else 'secondary' }}">
+        {{ task.status|title }}
+    </span>
+</td>
+</tr>
+{% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No tasks yet. Create one above!</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<a href="{{ url_for('dashboard.index') }}" class="btn btn-secondary mb-3">← Back to Dashboard</a>
+<div class="container">
+    <h2>My Assigned Tasks</h2>
+    
+    {% if tasks %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Task</th>
+                <th>Project</th>
+                <th>Due Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr>
+                <td>{{ task.title }}</td>
+                <td>{{ task.project.name if task.project else 'N/A' }}</td>
+                <td>{{ task.due_date.strftime('%d %b') if task.due_date else '-' }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('tasks.update_status', task_id=task.id) }}">
+                        <select name="status" onchange="this.form.submit()" class="form-select form-select-sm w-auto d-inline">
+                            <option value="todo" {{ 'selected' if task.status=='todo' else '' }}>To Do</option>
+                            <option value="inprogress" {{ 'selected' if task.status=='inprogress' else '' }}>In Progress</option>
+                            <option value="done" {{ 'selected' if task.status=='done' else '' }}>Done</option>
+                        </select>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-info">You have no tasks assigned yet.</div>
+    {% endif %}
+</div>
+{% endblock %}
